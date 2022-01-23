@@ -1,29 +1,39 @@
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { Icon } from "leaflet";
+import React, { useEffect, useState } from "react";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { subscribe } from "react-mqtt-client";
 import "leaflet/dist/leaflet.css";
 import "./customMap.css";
-import mapMarker from "../map-marker-alt-solid.svg";
+import RoutingLeafEl from "./RoutingMachine";
 
-const markerIcon = new Icon({
-  iconUrl: mapMarker,
-  iconSize: [25, 25],
-});
+function CustomMap({ data }) {
+  const [markers, setMarkers] = useState(data);
+  const zoomLevel = 10;
 
-function CustomMap() {
+  useEffect(() => {
+    let mounted = true;
+    mounted && setMarkers(data);
+
+    return () => {
+      mounted = false;
+    };
+  }, [data]);
+
   return (
-    <MapContainer center={[51.505, -0.09]} zoom={13}>
+    <MapContainer
+      center={
+        data?.length > 0
+          ? data[0].geometry.coordinates
+          : [22.569950998203502, 88.37333679199219]
+      }
+      zoom={zoomLevel}
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[51.505, -0.09]} icon={markerIcon}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
+      {markers?.length > 0 && <RoutingLeafEl markers={markers} />}
     </MapContainer>
   );
 }
 
-export default CustomMap;
+export default subscribe({ topic: "location" })(CustomMap);
