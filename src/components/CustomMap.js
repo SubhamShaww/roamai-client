@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { subscribe } from "react-mqtt-client";
 import "leaflet/dist/leaflet.css";
@@ -6,17 +6,7 @@ import "./customMap.css";
 import RoutingLeafEl from "./RoutingMachine";
 
 function CustomMap({ data }) {
-  const [markers, setMarkers] = useState(data);
   const zoomLevel = 10;
-
-  useEffect(() => {
-    let mounted = true;
-    mounted && setMarkers(data);
-
-    return () => {
-      mounted = false;
-    };
-  }, [data]);
 
   return (
     <MapContainer
@@ -31,7 +21,7 @@ function CustomMap({ data }) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {markers?.length > 0 && <RoutingLeafEl markers={markers} />}
+      {data?.length > 0 && <RoutingLeafEl markers={data} />}
     </MapContainer>
   );
 }
